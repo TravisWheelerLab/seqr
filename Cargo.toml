@@ -1,0 +1,17 @@
+[package]
+name = "seqr"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.86"
+clap = { version = "4.5.8", features = ["derive"] }
+kseq = "0.5.3"
+regex = "1.10.5"
+
+[dev-dependencies]
+assert_cmd = "2.0.14"
+predicates = "3.1.0"
+pretty_assertions = "1.4.0"
+rand = "0.8.5"
+tempfile = "3.10.1"
