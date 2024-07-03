@@ -1,0 +1,2 @@
+# seqr
+FASTX sequence tool
