@@ -28,6 +28,10 @@ pub enum Command {
     #[clap(alias = "co")]
     Count(CountArgs),
 
+    /// Show headers
+    #[clap(alias = "he")]
+    Headers(HeadersArgs),
+
     /// File statistics
     #[clap(alias = "st")]
     Stats(StatsArgs),
@@ -43,6 +47,22 @@ pub struct CountArgs {
     /// Input file(s)
     #[arg(value_name = "FILE", default_value = "-")]
     files: Vec<String>,
+}
+
+#[derive(Debug, Clone, Parser)]
+#[command(author, version, about)]
+pub struct HeadersArgs {
+    /// Input file(s)
+    #[arg(value_name = "FILE", default_value = "-")]
+    files: Vec<String>,
+
+    /// Print ID only
+    #[arg(short, long("id"))]
+    id_only: bool,
+
+    /// Print description only
+    #[arg(short, long("desc"))]
+    desc_only: bool,
 }
 
 #[derive(Debug, Clone, Parser)]
@@ -183,12 +203,16 @@ fn main() {
 // --------------------------------------------------
 fn run(args: Cli) -> Result<()> {
     match &args.command {
+        Some(Command::Count(args)) => {
+            count(args.clone())?;
+            Ok(())
+        }
         Some(Command::Grep(args)) => {
             grep(args.clone())?;
             Ok(())
         }
-        Some(Command::Count(args)) => {
-            count(args.clone())?;
+        Some(Command::Headers(args)) => {
+            headers(args.clone())?;
             Ok(())
         }
         Some(Command::Filter(args)) => {
@@ -412,6 +436,29 @@ fn grep(args: GrepArgs) -> Result<()> {
             }
         }
     }
+    Ok(())
+}
+
+// --------------------------------------------------
+fn headers(args: HeadersArgs) -> Result<()> {
+    for filename in &args.files {
+        match open(filename) {
+            Err(e) => eprintln!("{filename}: {e}"),
+            Ok(file) => {
+                let mut reader = parse_reader(file)?;
+                while let Some(rec) = reader.iter_record()? {
+                    if args.id_only {
+                        println!("{}", rec.head());
+                    } else if args.desc_only {
+                        println!("{}", rec.des().trim());
+                    } else {
+                        println!("{}{}", rec.head(), rec.des());
+                    }
+                }
+            }
+        }
+    }
+
     Ok(())
 }
 
