@@ -373,14 +373,14 @@ fn count(args: CountArgs) -> Result<()> {
             Ok(file) => {
                 let mut reader = parse_reader(file)?;
                 let mut num = 0;
-                while let Some(_) = reader.iter_record()? {
+                while (reader.iter_record()?).is_some() {
                     num += 1;
                 }
 
                 if filename == "-" {
                     println!("{num:>10}");
                 } else {
-                    println!("{num:>10}: {filename}");
+                    println!("{num:>10} {filename}");
                 }
                 total += num;
             }
